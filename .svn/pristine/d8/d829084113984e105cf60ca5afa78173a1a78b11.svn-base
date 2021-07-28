@@ -1,0 +1,99 @@
+//Adapter powinien przesy³ac informacjê o ruchu zarówno do Game gracza, jak i Game przeciwnika:
+//Game gracza i Game przeciwnika powinny wykonac takie same operacje
+
+
+package Player;
+
+import Exceptions.IllegalMoveException;
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.PlayerPassedException;
+import Exceptions.RepeatedSituationException;
+import Game.*;
+
+public class PlayerToGameFacade implements IPlayerToGame 
+{
+
+	Game game;
+	public PlayerToGameFacade(int boardSize) {
+		game = new Game(boardSize);
+		
+	}
+	@Override
+	public void endGame() 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pass() 
+	{
+		game.passGame(game.getOnMove(), true);
+		if(game.doesGameEnd())
+			endGame();
+
+	}
+
+	@Override
+	public Colour[][] getTable() 
+	{
+		return game.getBoard();
+	}
+
+	@Override
+	public void makeMove(int x, int y) throws 
+	InitialBreathException, 
+	PlaceReservedException, 
+	RepeatedSituationException, 
+	PlayerPassedException
+	{
+		Colour nom = game.getOnMove()==Colour.BLACK?Colour.WHITE:Colour.BLACK;
+		if(! game.playerPassed() )
+		{
+			Colour[][] prev = game.getPreviousBoard();
+			Colour[][] now = game.getBoard();
+			game.squaresToBoard(game.getPreviousBoard());
+			try{
+				game.addStone(x, y, game.getOnMove());
+				game.squaresToBoard(game.getBoard());
+				game.changeColourOnMove();
+				//jeœli wykona³eœ ruch, to zdejmij pass z wroga
+				if(game.playerPassed())
+				{
+					game.passGame(nom, false);
+				}
+			}
+			catch(IllegalMoveException e)
+			{
+				//wracamy do stanu pocz¹tkowego
+				game.setPreviousBoard(prev);
+				game.setBoard(now);
+				//przeka¿ wyj¹tki dalej
+				if(e instanceof InitialBreathException)
+					throw new InitialBreathException();
+				if(e instanceof PlaceReservedException)
+					throw new PlaceReservedException();
+				if(e instanceof RepeatedSituationException)
+					throw new RepeatedSituationException();
+			}
+		}
+		else
+		{
+			throw new PlaceReservedException();
+		}
+	}
+
+	@Override
+	public void setDeadSquare(int x, int y) 
+	{
+		// TODO Auto-generated method stub
+
+	}
+	
+	@Override
+	public Colour onMove()
+	{
+		return game.getOnMove();
+	}
+}

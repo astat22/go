@@ -1,0 +1,21 @@
+package ClientTest;
+
+import org.junit.*;
+
+import Client.Window;
+
+
+public class WindowTest 
+{
+	private Window win;
+	@Before
+	public void runBeforeTest()
+	{
+		win = new Window();
+	}
+	@Test
+	public void askForAcceptanceTest()
+	{
+		Assert.assertTrue(win.askForAcceptance());
+	}
+}

@@ -1,0 +1,115 @@
+package PlayerTest;
+
+import org.junit.*;
+
+import Exceptions.IllegalMoveException;
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.PlayerPassedException;
+import Exceptions.RepeatedSituationException;
+import Game.Colour;
+import Player.PlayerToGameFacade;
+
+public class FacadeTest 
+{
+	int dummyGameX[] = {0,1,2,3,0,1,0,0,10,1,10,2,10};
+	int dummyGameY[] = {0,0,0,0,1,1,2,3,10,2,11,1,12};
+	PlayerToGameFacade facade;
+
+	@Before
+	public void runBeforeTest()
+	{
+		facade = new PlayerToGameFacade(13);
+	}
+	@Test
+	public void makeMoveTest()
+	{
+		try
+		{
+			for(int i=0;i<dummyGameX.length;i++)
+			{
+				facade.makeMove(dummyGameX[i], dummyGameY[i]);
+			}
+		}
+		catch(IllegalMoveException e)
+		{
+			System.out.println("Nielegalny ruch!");
+		}
+		//drawBoard(facade.getTable(), 13);
+		Assert.assertTrue("Colour Test",facade.getTable()[0][0]==Colour.NONE);
+		
+	}
+	@Test 
+	public void passTest()
+	{		
+		try
+		{
+			for(int i=0;i<dummyGameX.length;i++)
+			{
+				facade.makeMove(dummyGameX[i], dummyGameY[i]);
+			}
+			facade.pass();
+			Assert.assertTrue("White passed",facade.game.whitePassed);
+			facade.makeMove(12, 9); //facade.pass(); //
+			Assert.assertTrue("White pass released",!facade.game.whitePassed);
+			facade.pass();
+			facade.makeMove(11, 9);
+		}
+		catch(PlayerPassedException e){ System.out.println("Gracz spasowa³!!");}
+		catch(PlaceReservedException e){ System.out.println("Miejsce zarezerwowane");}
+		catch(InitialBreathException  e){ System.out.println("Brak oddechów");}
+		catch(RepeatedSituationException e){ System.out.println("Powtórzona sytuacja");}
+		drawBoard(facade.getTable(), 13);
+	}
+	@Test
+	public void endGameTest() //koñczenie gry przez podwójne spasowanie
+	{
+		try
+		{
+			for(int i=0;i<dummyGameX.length;i++)
+			{
+				facade.makeMove(dummyGameX[i], dummyGameY[i]);
+			}
+			facade.pass();
+			facade.makeMove(12, 9); //facade.pass(); //
+			facade.pass();
+			facade.makeMove(11, 9);
+			facade.pass(); 			
+			facade.pass();
+		}
+		catch(PlayerPassedException e){ System.out.println("Gracz spasowa³!!");}
+		catch(PlaceReservedException e){ System.out.println("Miejsce zarezerwowane");}
+		catch(InitialBreathException  e){ System.out.println("Brak oddechów");}
+		catch(RepeatedSituationException e){ System.out.println("Powtórzona sytuacja");}	
+		Assert.assertTrue("Game ended",facade.game.doesGameEnd());
+		System.out.println(facade.game.results.whitePoints);
+		System.out.println(facade.game.results.blackPoints);
+		Assert.assertEquals(8,facade.game.results.whitePoints);
+		Assert.assertEquals(6,facade.game.results.blackPoints);
+	}
+	public void drawBoard(Colour[][] board,int boardSize)
+	{
+		for(int i=0;i<boardSize;i++)
+		{
+			for(int j=0;j<boardSize;j++)
+			{
+				switch(board[i][j])
+				{
+					case NONE:
+						System.out.print("_");
+						break;
+					case BLACK:
+						System.out.print("X");
+						break;
+					case WHITE:
+						System.out.print("O");
+						break;
+					default:
+						break;
+					
+				}
+			}
+			System.out.print("\n");
+		}
+	}
+}

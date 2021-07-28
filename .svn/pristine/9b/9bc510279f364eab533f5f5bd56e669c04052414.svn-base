@@ -1,0 +1,278 @@
+package Game;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 
+ * @author Jacek
+ *
+ */
+public class Game 
+{
+	private int boardSize; 
+	public List<Chain> chains;
+	private Square[][] squares;
+	private Colour[][] board;
+	private Colour[][] previousBoard;
+	private boolean[][] legalMoves;
+	public Colour onMove = Colour.BLACK;
+	public Game(int size)
+	{
+		this.boardSize=size;
+		createSquares();
+	}
+/**
+ * Metoda wywo³ywana tylko raz, przez konstruktor. Tworzy boardSize x boardSize obiektów typu Square i umieszcza je w tablicy squares.
+ */
+	public void createSquares()
+	{
+		squares = new Square[boardSize][boardSize];
+		for(int y=0;y<boardSize;y++)
+			for(int x=0;x<boardSize;x++)
+			{
+				squares[x][y] = new Square(x,y,computeType(x,y));
+			}
+		//okreœlanie s¹siadów
+		for(int y=0;y<boardSize;y++)
+			for(int x=0;x<boardSize;x++)
+			{
+				if(x>0)
+					squares[x][y].getNeighbours()[2] = squares[x-1][y]; //W
+				else
+					squares[x][y].getNeighbours()[2] = null;
+				if(x<boardSize-1)
+					squares[x][y].getNeighbours()[3] = squares[x+1][y]; //E
+				else
+					squares[x][y].getNeighbours()[3] = null;
+				if(y>0)
+					squares[x][y].getNeighbours()[1] = squares[x][y-1]; //S
+				else
+					squares[x][y].getNeighbours()[1] = null;
+				if(y<boardSize-1)
+					squares[x][y].getNeighbours()[0] = squares[x][y+1]; //N
+				else
+					squares[x][y].getNeighbours()[0] = null;
+			}
+	}
+	/**
+	 * Metoda zwracaj¹ca ³añcuch, którego elementem jest stone
+	 * @param stone
+	 * @return
+	 */
+	public Chain findChainByStone(Square stone)
+	{
+		for(Chain chain: chains)
+		{
+			if(chain.isStoneHere(stone))
+				return chain;
+		}
+		return null;
+	}
+	/**
+	 * Metoda ustalaj¹ca typ pola Square, tzn., czy pole (x,y) le¿y na krawêdzi, na rogu, czy w œrodku planszy
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Type computeType(int x,int y)
+	{
+		if(x==0 && y==0)
+			return Type.SW;
+		if(x==boardSize-1 && y==0)
+			return Type.SE;
+		if(x==0 && y==boardSize-1)
+			return Type.NW;
+		if(x==boardSize-1 && y==boardSize-1)
+			return Type.NE;
+		if(x==0)
+			return Type.W;
+		if(x==boardSize-1 )
+			return Type.E;
+		if(y==0)
+			return Type.S;
+		if(y==boardSize-1)
+			return Type.N;
+		return Type.REGULAR;
+	}
+	/**
+	 * Metoda zwracaj¹ca pole planszy po jego wspó³rzêdnych
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Square getSquareByCoordinates(int x,int y)
+	{
+		return squares[x][y];
+	}
+	/**
+	 * £¹czy dwa ³añcuchy z listy c w jeden, C
+	 * Usuwa z listy @chains ³añcuchy z c.
+	 * Wylicza now¹ liczbê oddechów dla C.
+	 * Jeœli ruch okaza³by siê niedozwolony, C nie jest dodawany do listy, a c nie s¹ usuwane
+	 * 
+	 * @param c
+	 *
+	 */
+	private void mergeChains(List<Chain> listOfChains) throws CannotMergeChainsException
+	{
+		List<Square> sumOfSquaresLists = new ArrayList<Square>();
+		for(Chain c: listOfChains)
+		{
+			sumOfSquaresLists.addAll(c.getStones());
+		}
+		Chain newChain = new Chain(sumOfSquaresLists);
+		if(newChain.getBreaths()>0)
+		{
+			for(Chain c: listOfChains)
+			{
+				removeChainFromChainList(c);
+			}
+			chains.add(newChain);
+		}
+		else
+		{
+			throw new CannotMergeChainsException();
+		}
+	}
+	/**
+	 * Metoda usuwaj¹ca ³añcuch z listy ³añcuchów
+	 * @param chainToRemove
+	 */
+	public void removeChainFromChainList(Chain chainToRemove)
+	{
+		chains.remove(chainToRemove);
+	}
+	/**
+	 * Metoda s³u¿¹ca do umieszczania nowego kamienia na planszy
+	 * @param x
+	 * @param y
+	 * @param colour
+	 * @throws PlaceReservedException
+	 */
+	public void addStone(int x, int y, Colour colour) throws PlaceReservedException, InitialBreathException
+	{
+		Square place = getSquareByCoordinates(x, y);
+		if(place.getColour()!=Colour.NONE) //miejsce jest zajête
+		{
+			throw new PlaceReservedException();
+		}
+		else
+		{
+			//sprawdzanie s¹siadów 
+			if(initialBreathCheking(place, colour)) //czy po dodaniu kamienia bêdzie oddech?
+			{
+				Chain chainForSquare = placeStone(place, colour); //zmienianie koloru pola
+				//po³¹cz ³añcuchy TODO
+				// usuñ uduszone kamienie TODO
+			}
+			else
+			{
+				throw new InitialBreathException();
+			}
+		}
+	}
+	/**
+	 * 
+	 * @param newStone
+	 * @param colour
+	 * @return
+	 */
+	public Chain placeStone(Square newStone, Colour colour)
+	{
+		newStone.setColour(colour);
+		//dodaj kamieñ do zaprzyjaŸnionego ³añcucha 
+		//TODO ³¹czenie ³añcuchów 
+		Chain fChain = getFriendlyChains(newStone);
+		if(fChain!=null)//istnieje zaprzyjaŸniony ³añcuch
+		{
+			fChain.addStone(newStone);;
+		}
+		else //nie istnieje zaprzyjaŸniony ³añcuch. stwórz nowy ³añcuch i dodaj go do listy ³añcuchów.
+		{
+			fChain = new Chain(newStone);
+			chains.add(fChain);
+		}
+		return fChain;
+	}
+	/**
+	 * Metoda wykonywana po ka¿dym ruchu, oddaj¹ca kolejkê drugiemu graczowi
+	 */
+	public void changeColourOnMove()
+	{
+		if(onMove == Colour.BLACK)
+			onMove = Colour.WHITE;
+		else
+			onMove = Colour.BLACK;
+	}
+	/**
+	 * Metoda s³u¿¹ca do usuwania ³añcucha chainToRemove z planszy
+	 * @param chainToRemove
+	 */
+	public void removeChainFromBoard(Chain chainToRemove)
+	{
+		//TODO
+	}
+	/**
+	 * Metoda otrzymuje Square place jako parametr i zwraca takie s¹siednie ³añcuchy place, które maj¹ identyczny kolor jak place
+	 * @param place
+	 * @return
+	 */
+	public List<Chain> getNeighbourChains(Square place)
+	{
+		List<Chain> neighbourChainList = new ArrayList<Chain>();
+		Colour colour = place.getColour();
+		Square[] neighbours = place.getNeighbours();
+		Chain localChain;
+		for(Square s: neighbours)
+		{
+			if(s!=null)//place mo¿e le¿e na brzegu
+			{
+				if(s.getColour()==colour) //szukamy ³añcuchy tego samego koloru co place
+				{
+					localChain = findChainByStone(s);
+					if(!neighbourChainList.contains(localChain)) //do listy dodajemy tylko unikatowe ³añcuchy
+						neighbourChainList.add(localChain);
+				}
+			}
+		}
+		if(neighbourChainList.size()>0)//zamiast pustej listy zwracamy null
+			return neighbourChainList;
+		else
+			return null;
+	}
+	/**
+	 * Metoda s³u¿¹ca do sprawdzania, czy kamieñkoloru colour dodany na pole square bêdzie mia³ oddech
+	 * @param square
+	 * @param colour kolor dodawanego kamienia
+	 * @return
+	 */
+	public boolean initialBreathCheking(Square square, Colour colour)
+	{
+		//TODO
+		List<Square> neighbours = square.getNotNullNeighbours();
+		List<Square> friendlySquares = new ArrayList<>();
+		for(Square s: neighbours)
+		{
+			if(s.getColour() == Colour.NONE)
+				return true; //wolne pole oznacza, ¿e jest oddech
+			if(s.getColour() == colour)
+				friendlySquares.add(s);
+		}
+		if(friendlySquares.isEmpty()) //brak wolnych pól oraz brak przyjaznych pól
+			return false;
+		else	//sprawdzanie oddechów przyjaznych pól
+		{
+			for(Square fs: friendlySquares)
+			{
+				if(findChainByStone(fs).getBreaths()>1)//jeœli cho jeden przyjazny ³añcuch-s¹siad ma wiêcej ni¿ 1 oddech, kamieñ bêdzie mia³ oddechy
+					return true;
+			}
+		}
+		return false;
+	}
+	public Chain getFriendlyChains(Square s)
+	{
+		//TODO
+		return null;
+	}
+}

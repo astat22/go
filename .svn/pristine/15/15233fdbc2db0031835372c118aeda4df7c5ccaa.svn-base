@@ -1,0 +1,48 @@
+package Game;
+
+public class Square 
+{
+	private int xCoord;
+	private int yCoord;
+	private Colour colour;
+	private Type type;
+	private Square[] neighbours;
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param type 
+	 */
+	public Square(int x, int y, Type type)
+	{
+		this.xCoord=x;
+		this.yCoord=y;
+		this.type=type;
+		this.colour = Colour.NONE;
+		neighbours = new Square[4];
+	}
+	public Colour getColour() 
+	{
+		return colour;
+	}
+	public void setColour(Colour colour) 
+	{
+		this.colour = colour;
+	}
+	public Square[] getNeighbours() 
+	{
+		return neighbours;
+	}
+	public void setNeighbours(Square[] neighbours) 
+	{
+		this.neighbours = neighbours;
+	}
+	public int getxCoord() 
+	{
+		return xCoord;
+	}
+	public int getyCoord() 
+	{
+		return yCoord;
+	}
+}

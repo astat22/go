@@ -1,0 +1,48 @@
+package Server;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.io.*;
+import java.net.*;
+
+import Game.Colour;
+import Player.Player;
+
+public class Server
+{
+	public static List<PlayedGame> currentGames;
+	int boardSize = 19;
+	public static void main(String[] args) throws Exception
+	{
+		currentGames = new ArrayList<PlayedGame>();
+		/*Tworze na podanym porcie gniazdo serwera,
+		 *które posiada dodatkowe funkcjonalnoœci umo¿liwiaj¹ce równoczesn¹ obs³ugê wielu po³¹czeñ.
+		 */
+		ServerSocket listener = new ServerSocket(8989);
+		System.out.println("Go game server is running");
+		try
+		{
+			while (true)
+			{
+				/*Tworze nowa gre, do której bêdê przypisywac graczy*/
+				PlayedGame newGame = new PlayedGame();
+				/* Metoda accept() czeka na nadejœcie po³¹czenia, 
+				 * jeœli ¿¹danie takie po³¹czenia nadejdzie, 
+				 * to zwraca nowe gniazdo s³u¿¹ce do obs³ugi tego po³¹czenia.*/
+				newGame.playerWhite = new Player(listener.accept(),Colour.WHITE);
+				newGame.playerBlack = new Player(listener.accept(),Colour.BLACK);
+				/*Okreslam przeciwnikow*/
+				newGame.setOpponent();
+				//game.currentPlayer = playerBlack;
+				/*Metoda start() powoduje rozpoczêcie wykonania kodu z klasy Player*/
+				newGame.playerBlack.start();
+				newGame.playerWhite.start();
+				currentGames.add(newGame);
+			}
+		}
+		finally
+		{
+			listener.close();
+		}
+	}
+}

@@ -1,0 +1,8 @@
+package Game;
+
+import Exceptions.IllegalMoveException;
+
+public class CannotMergeChainsException extends IllegalMoveException 
+{
+
+}

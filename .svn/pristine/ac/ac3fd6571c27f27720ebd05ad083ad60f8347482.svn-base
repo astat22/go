@@ -1,0 +1,59 @@
+package Player;
+
+import Exceptions.GameNotEndedException;
+import Exceptions.IllegalMoveException;
+import Exceptions.IllegalOwnerException;
+import Game.Colour;
+import Game.Report;
+
+public class SimpleBot extends Thread implements IPlayerToGame {
+
+	PlayerToGameFacade facade;
+	@Override
+	public void pass() {
+		facade.pass();
+
+	}
+
+	@Override
+	public Colour[][] getTable() {
+		return facade.getTable();
+	}
+
+	@Override
+	public void makeMove(int x, int y) 
+	{
+		try
+		{
+			facade.makeMove(x, y);
+		}
+		catch(IllegalMoveException e)
+		{
+			
+		}
+
+	}
+
+	@Override
+	public void setDeadSquare(int x, int y, Colour owner) throws IllegalOwnerException, GameNotEndedException
+	{
+		facade.setDeadSquare(x, y, owner);
+
+	}
+
+	@Override
+	public void endGame() {
+		facade.endGame();
+
+	}
+	@Override 
+	public Colour onMove()
+	{
+		return facade.onMove();
+	}
+	@Override
+	public Report getResults()
+	{
+		return null;
+	}
+}

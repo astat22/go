@@ -1,0 +1,94 @@
+/*TODO
+ * nazwa u¿ytkownika
+ * obiekt Player i komunikacja z nim
+ * implementacja MouseListener
+ */
+package Client;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.swing.*;
+
+//import Player.Player;
+
+public class Client extends JFrame implements MouseListener
+{
+	public static final long serialVersionUID = 42L;
+	private JFrame frame;
+    private JLabel messageLabel;
+	
+	private int PORT = 8989;
+    private Socket socket;
+    //private BufferedReader in;
+    //private PrintWriter out;
+	private ObjectInputStream clInput;
+	private ObjectOutputStream clOutput;
+
+    
+    //private Player tools;
+    
+    public Client(String serverAddress) 
+    {
+    	frame = new JFrame("Go game");
+    	messageLabel =  new JLabel("");
+    	try
+    	{
+        	socket = new Socket(serverAddress, PORT);
+			clOutput = new ObjectOutputStream(socket.getOutputStream());
+			clInput = new ObjectInputStream(socket.getInputStream());
+            //in.readObj
+    	}
+    	catch(IOException e){}
+//trzeba poczeka na przeciwnika    
+    	
+        frame.setSize(800,800);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        frame.setResizable(false);
+        frame.addMouseListener(this);
+        
+      // tu trzeba siê jeszcze pobawic, nie wiem, jak bêdzie, ale koniecznie œcie¿ka wzdlêdna!
+        //JLabel background = new JLabel(new ImageIcon("./images/goboard.png")); 
+    }
+    
+    public void paintComponent(Graphics g)
+    {	
+
+    }
+    
+    public static void main(String[] args) throws Exception 
+    {
+        String serverAddress="localhost";
+        String login = "Jacek";
+        JOptionPane.showInputDialog("Podaj adres serwera",serverAddress);//(args.length == 0) ? "localhost" : args[1];
+        JOptionPane.showInputDialog("Podaj login",login);
+        String[] opponent = {"Bot","Losowy przeciwnik"};
+        JFrame question = new JFrame("Wybór przeciwnika");
+        String opponentName = (String) JOptionPane.showInputDialog(question, 
+                "Wybierz przeciwnika",
+                "Opponent",
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                opponent, 
+                opponent[0]);
+
+        Client client = new Client(serverAddress);
+    }
+    public void mouseClicked(MouseEvent evt)
+    {
+    	
+    }
+    public void mouseEntered(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
+    public void mousePressed(MouseEvent e){}
+    public void mouseExited(MouseEvent e){}
+}

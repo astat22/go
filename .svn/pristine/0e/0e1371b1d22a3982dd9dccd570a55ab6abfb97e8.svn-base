@@ -1,0 +1,60 @@
+package PlayerTest;
+
+import org.junit.*;
+
+import Exceptions.IllegalMoveException;
+import Game.Colour;
+import Player.PlayerToGameFacade;
+
+public class FacadeTest 
+{
+	PlayerToGameFacade facade;
+
+	@Before
+	public void runBeforeTest()
+	{
+		facade = new PlayerToGameFacade(13);
+	}
+	@Test
+	public void makeMoveTest()
+	{
+		int dummyGameX[] = {0,1,2,3,0,1,0,0,10};
+		int dummyGameY[] = {0,0,0,0,1,1,2,3,10};
+		try
+		{
+			for(int i=0;i<dummyGameX.length;i++)
+			{
+				facade.makeMove(dummyGameX[i], dummyGameY[i]);
+			}
+		}
+		catch(IllegalMoveException e)
+		{
+			System.out.println("Nielegalny ruch!");
+		}
+	}
+	public void drawBoard(Colour[][] board,int boardSize)
+	{
+		for(int i=0;i<boardSize;i++)
+		{
+			for(int j=0;j<boardSize;j++)
+			{
+				switch(board[i][j])
+				{
+					case NONE:
+						System.out.print(" ");
+						break;
+					case BLACK:
+						System.out.print("X");
+						break;
+					case WHITE:
+						System.out.print("O");
+						break;
+					default:
+						break;
+					
+				}
+			}
+			System.out.print("\n");
+		}
+	}
+}

@@ -1,0 +1,6 @@
+package Server;
+
+public enum Order 
+{
+	PLAY,PASS,GET_TABLE,TABLE, SET_DEAD,GET_RESULTS,RESULTS,ACCEPT,DENY,START;
+}

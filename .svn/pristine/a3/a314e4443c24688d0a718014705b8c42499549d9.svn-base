@@ -1,0 +1,43 @@
+//@TODO Klaudia, zaimplementuj, proszê, funkcjonalnoœc Playera, ³¹cz¹c go z innym Playerem. Funkcje @Override
+//to po prostu ma byc wywo³anie adapter.funkcja(), tak jak zrobi³em w pass()
+
+package Player;
+
+import Game.Colour;
+
+public class Player implements IPlayerToGame {
+
+	@Override
+	public void startGame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	PlayerToGameAdapter	adapter;
+	Colour colour;
+
+	@Override
+	public void pass() {
+		adapter.pass();
+
+	}
+
+	@Override
+	public Colour[][] getTable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void makeMove(int x, int y) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setDeadSquare(int x, int y) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

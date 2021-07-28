@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2.0">
+  <zoom_level>4</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>128</x>
+      <y>20</y>
+      <w>208</w>
+      <h>380</h>
+    </coordinates>
+    <panel_attributes>Game::Game
+--
+-boardSize: int
++chains: List&lt;Chain&gt;
+-squares: Square[][]
++board: Colour[][]
++previousBoard: Colour[][]
++legalMoves: boolean[][]
+-onMove = Colour.BLACK: Colour
++whiteSlaves = 0, blackSlaves = 0: int
++whitePassed = false, blackPassed = false: boolean
++gameEnded = false: boolean
++territories: List&lt;Territory&gt;
++results: Report
++tt: GameTest.TestTools
+--
++Game(int size): ctor
++clone(): Object
+-createSquares(): void
++findChainByStone(Square stone): Chain
+-computeType(int x, int y): SType
++getSquareByCoordinates(int x, int y): Square
+-mergeChains(List&lt;Chain&gt; listOfChains, boolean mergeAnyway): void
+-removeChainFromChainList(Chain chainToRemove): void
+-compareBoards(Colour[][] boardA, Colour[][] boardB): boolean
+-checkForDeadChains(boolean almostDead, Colour col): List&lt;Chain&gt;
+-checkForDeadChains(boolean almostDead, Square n, Colour col): List&lt;Chain&gt;
++removeListOfChains(List&lt;Chain&gt; chainsToRemove): void
++addStone(int x, int y, Colour colour): void
++placeStone(Square newStone, Colour colour, boolean placeAnyway): Chain
++changeColourOnMove(): void
++removeChainFromBoard(Chain chainToRemove): void
++getNeighbourChains(Square place): List&lt;Chain&gt;
++initialBreathCheking(Square square, Colour colour): boolean
++getFriendlyChains(Square square, Colour colour): List&lt;Chain&gt;
++squaresToBoard(Colour[][] board): void
++passGame(Colour c, boolean set): void
++doesGameEnd(): boolean
++playerPassed(): boolean
++setDead(int x, int y): void
++endGame(): void
++computeTerritories(): void
++finalScore(): Report
++getBoard(): Colour[][]
++getLegalMoves(): boolean[][]
++getOnMove(): Colour
++setOnMove(Colour onMove): void
++getPreviousBoard(): Colour[][]
++setBoard(Colour[][] board): void
++setPreviousBoard(Colour[][] previousBoard): void
++getBoardSize(): int
++setBoardSize(int boardSize): void
++getChains(): List&lt;Chain&gt;
++setChains(List&lt;Chain&gt; chains): void
++getSquares(): Square[][]
++setSquares(Square[][] squares): void
++setLegalMoves(boolean[][] legalMoves): void
++getResults(): Report
++getSquares2Board(): Colour[][]
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>148</x>
+      <y>472</y>
+      <w>116</w>
+      <h>188</h>
+    </coordinates>
+    <panel_attributes>Client::Window
+--
++serialVersionUID = 42L: long
+-board, menu: JPanel
+-passButton: JButton
++table: Colour[][]
+-boardSize: int
+-coord: int[]
+-phase: Phase
+-al: ActionListener
+-order: Order
+--
++Window(): ctor
++Window(int boardSize, String login): ctor
++endPhase(Phase p, Colour c): void
++coord2Square(int x, int y): int[]
++mouseClicked(MouseEvent evt): void
++mouseEntered(MouseEvent e): void
++mouseReleased(MouseEvent e): void
++mousePressed(MouseEvent e): void
++mouseExited(MouseEvent e): void
++setOrder(Order o): void
++getOrder(): Order
++isActive(): boolean
++setActive(): void
++getCoord(): int[]
++setTable(Colour[][] table): void
++refresh(): void
++askForAcceptance(): boolean
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>592</x>
+      <y>432</y>
+      <w>308</w>
+      <h>176</h>
+    </coordinates>
+    <panel_attributes>Player::Player
+--
+~facade: PlayerToGameFacade
+~opponent: Player
+~socket: Socket
+~colour: Colour
++input: ObjectInputStream
++output: ObjectOutputStream
+-gameEnded = false: boolean
+-botAsOpponent: boolean
+~boardSize = 19: int
+--
++Player(Socket socket, Colour c, ObjectInputStream input, ObjectOutputStream output, int size): ctor
++Player(Socket socket, Colour c, ObjectInputStream input, ObjectOutputStream output, PlayerToGameFacade fac): ctor
++Player(Colour c): ctor
++setDeadSquare(int x, int y, Colour owner): void
++getTable(): Colour[][]
++endGame(): void
++onMove(): Colour
++makeMove(int x, int y): void
++pass(): void
++setOpponent(Player opponent): void
++getResults(): Report
++getFacade(): PlayerToGameFacade
++isGameEnded(): boolean
++setGameEnded(boolean gameEnded): void
++setFacade(PlayerToGameFacade facade): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>364</x>
+      <y>632</y>
+      <w>172</w>
+      <h>168</h>
+    </coordinates>
+    <panel_attributes>Message::Message
+--
++serialVersionUID = 42L: long
+-order: Order
++table: Colour[][]
++board: int[][]
++x, y, rec, size = 19: int
++owner: String
++col: Colour
++phase: Phase
++results: Report
+--
++Message(Order order): ctor
++Message(Order order, Colour[][] t, int i, int x, int y, Colour c): ctor
++Message(Order order, Colour[][] t): ctor
++Message(Order order, int x, int y): ctor
++Message(Order order, int x, int y, Phase p): ctor
++Message(Order order, Colour c): ctor
++Message(Order order, Report rep): ctor
+-colourToInt(): int[][]
++int2Col(): Colour[][]
++getOrder(): Order
++getTable(): Colour[][]
++getX(): int
++getY(): int
++getCol(): Colour
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>408</x>
+      <y>0</y>
+      <w>116</w>
+      <h>156</h>
+    </coordinates>
+    <panel_attributes>Game::Square
+--
+-xCoord: int
+-yCoord: int
+-colour: Colour
+-isAlive = true: boolean
+-type: SType
+-marked = false: boolean
+-neighbours: Square[]
+--
++Square(int x, int y, SType type): ctor
++Square(int x, int y, Colour colour): ctor
++getType(): SType
++getColour(): Colour
++setColour(Colour colour): void
++getNeighbours(): Square[]
++getNotNullNeighbours(): List&lt;Square&gt;
++setNeighbours(Square[] neighbours): void
++getxCoord(): int
++getyCoord(): int
++isAlive(): boolean
++setAlive(boolean isAlive): void
++isMarked(): boolean
++setMarked(boolean marked): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>144</x>
+      <y>684</y>
+      <w>128</w>
+      <h>144</h>
+    </coordinates>
+    <panel_attributes>Client::Client
+--
++serialVersionUID = 42L: long
+-frame: Window
+-messageLabel: JLabel
+-PORT = 8990: int
+-socket: Socket
+-login: String
+-clInput: ObjectInputStream
+-clOutput: ObjectOutputStream
+-boardSize = 19: int
+-myColour: Colour
+-phase: Phase
+-tools: TestTools
+--
++Client(String serverAddress, String login): ctor
++run(): void
++main(String[] args): void
++startGame(): void
++followOrders(Message m): void
++waitForOrder(): void
++negotiate(Phase p): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>924</x>
+      <y>432</y>
+      <w>132</w>
+      <h>136</h>
+    </coordinates>
+    <panel_attributes>Player::SimpleBot
+--
+~facade: PlayerToGameFacade
+-surrender: boolean
+-size: int
+-rn: Random
+-col: Colour
+--
++SimpleBot(int size, Colour colour): ctor
++run(): void
++pass(): void
++getTable(): Colour[][]
++makeMove(int x, int y): void
++randomDecision(): void
++setDeadSquare(int x, int y, Colour owner): void
++endGame(): void
++onMove(): Colour
++getResults(): /**
+	 * Metoda niepotrzebna dla bota
+	 */&#13;
+Report
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>396</x>
+      <y>432</y>
+      <w>132</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>Player::PlayerToGameFacade
+--
++game: Game
++gameEnded = false: boolean
+--
++PlayerToGameFacade(int boardSize): ctor
++endGame(): void
++pass(): void
++getTable(): Colour[][]
++makeMove(int x, int y): void
++setDeadSquare(int x, int y, Colour owner): void
++onMove(): Colour
++getResults(): /**
+	 * Oblicza terytoria i zwraca wynik - Raport.
+	 */&#13;
+Report
++isGameEnded(): boolean
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>504</x>
+      <y>168</y>
+      <w>116</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>Game::Chain
+--
++breaths: int
+~colour: Colour
++isAlive = true: boolean
+--
++Chain(Square stone): ctor
++Chain(List&lt;Square&gt; chainedStones): ctor
++Chain(Colour colour): ctor
++computeBreaths(): void
++getBreaths(): int
++getColour(): Colour
++computeNumberOfBreaths(): int
++addStone(Square newStone): void
++isAlive(): boolean
++setAlive(boolean isAlive): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>592</x>
+      <y>656</y>
+      <w>180</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>Server::PlayedGame
+--
++playerWhite: Player
++playerBlack: Player
++boardSize = 19: int
+-count = 0: int
+-phase = Phase.FIGHT: Phase
+-facade: PlayerToGameFacade
+--
++run(): void
++setOpponent(): void
++noticeStart(): void
+-playerOnMove(): Player
+-playerNextToMove(): Player
++followOrders(Message m): void
++negotiations(Message pom, Message np, Phase p, int x, int y): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>592</x>
+      <y>48</y>
+      <w>208</w>
+      <h>92</h>
+    </coordinates>
+    <panel_attributes>Game::Plane
+--
++stones: List&lt;Square&gt;
++neighbours: List&lt;Square&gt;
++colour: Colour
+--
++computeNeighbours(): void
++computeListOfNeighbours(): List&lt;Square&gt;
++getStones(): List&lt;Square&gt;
++getNeighbours(): List&lt;Square&gt;
++getColour(): Colour
++isStoneHere(Square stone): boolean
++canBeAddedToNeighbours(Square stone, List&lt;Square&gt; neighbours): boolean
++addStone(Square newStone): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>628</x>
+      <y>188</y>
+      <w>180</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>Game::Territory
+--
+-territoryOwner: Colour
+-points: int
+--
++Territory(Square place, Chain requester): ctor
+-exploreTerritory(): void
++listEqualsNoOrder(List&lt;T&gt; l1, List&lt;T&gt; l2): boolean
+-determineOwner(Colour claimer, List&lt;Square&gt; neighbours): Colour
++getTerritoryOwner(): Colour
++getPoints(): int
++computeListOfNeighbours(): List&lt;Square&gt;
++computeNeighbours(): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>680</x>
+      <y>800</y>
+      <w>100</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Server::Server
+--
++currentGames: List&lt;PlayedGame&gt;
++users: List&lt;User&gt;
+-port = 8990: int
+-wSocks: List&lt;Socket&gt;
+-ws, bs: Socket
+-players = 0: int
+-working = true: boolean
+--
++run(): void
++main(String[] args): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>612</x>
+      <y>328</y>
+      <w>132</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Player::IPlayerToGame
+--
+--
++pass(): void
++getTable(): Colour[][]
++makeMove(int x, int y): void
++setDeadSquare(int x, int y, Colour owner): void
++endGame(): void
++onMove(): Colour
++getResults(): Report
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>536</y>
+      <w>104</w>
+      <h>68</h>
+    </coordinates>
+    <panel_attributes>Game::Report
+--
++whitePoints: int
++blackPoints: int
+--
++Report(int wp, int bp): ctor
++getWhitePoints(): int
++setWhitePoints(int whitePoints): void
++getBlackPoints(): int
++setBlackPoints(int blackPoints): void
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>704</x>
+      <y>136</y>
+      <w>12</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;130.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>552</x>
+      <y>136</y>
+      <w>72</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>160.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>520</x>
+      <y>80</y>
+      <w>80</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=1..size^2</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>332</x>
+      <y>52</y>
+      <w>84</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=size^2</panel_attributes>
+    <additional_attributes>10.0;10.0;190.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>332</x>
+      <y>268</y>
+      <w>308</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>10.0;80.0;480.0;80.0;750.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>332</x>
+      <y>196</y>
+      <w>180</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>10.0;10.0;430.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>488</x>
+      <y>368</y>
+      <w>132</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>310.0;10.0;10.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>704</x>
+      <y>396</y>
+      <w>12</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>740</x>
+      <y>368</y>
+      <w>248</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;600.0;160.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>524</x>
+      <y>484</y>
+      <w>76</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>170.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>212</x>
+      <y>396</y>
+      <w>192</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>460.0;220.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>196</x>
+      <y>656</y>
+      <w>12</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>268</x>
+      <y>708</y>
+      <w>104</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+wysyła i odbiera
+m2=*
+</panel_attributes>
+    <additional_attributes>10.0;20.0;240.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>532</x>
+      <y>684</y>
+      <w>68</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.
+wysyła i odbiera
+m2=*</panel_attributes>
+    <additional_attributes>150.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>700</x>
+      <y>604</y>
+      <w>16</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=2</panel_attributes>
+    <additional_attributes>10.0;130.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>692</x>
+      <y>756</y>
+      <w>12</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=*</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>472</x>
+      <y>540</y>
+      <w>148</w>
+      <h>124</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>350.0;290.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

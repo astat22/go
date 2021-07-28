@@ -1,0 +1,152 @@
+package Player;
+import Exceptions.GameNotEndedException;
+import Exceptions.IllegalOwnerException;
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.PlayerPassedException;
+import Exceptions.RepeatedSituationException;
+import Game.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.ObjectInputStream.GetField;
+import java.net.Socket;
+
+public class Player extends Thread implements IPlayerToGame
+{
+		PlayerToGameFacade facade;
+	    Player opponent;
+        Socket socket;
+        Colour colour;
+    	public ObjectInputStream input;
+    	public ObjectOutputStream output;
+        int boardSize = 19;
+        
+        public Player(Socket socket, Colour c, ObjectInputStream input, ObjectOutputStream output)
+        {
+        	this.facade = new PlayerToGameFacade(boardSize);
+            this.socket = socket;
+            this.colour = c;
+            this.input = input;
+            this.output = output;
+        }
+        public Player(Socket socket, Colour c, PlayerToGameFacade fac, ObjectInputStream input, ObjectOutputStream output)
+        {
+        	this.facade = fac;
+            this.socket = socket;
+            this.colour = c;
+            this.input = input;
+            this.output = output;
+        }
+        @Override
+        public void setDeadSquare(int x,int y,Colour owner) throws GameNotEndedException, IllegalOwnerException
+        {
+        	facade.setDeadSquare(x, y, owner);
+        }
+        @Override
+        public Colour[][] getTable()
+        {
+        	return facade.getTable();
+        }
+        @Override
+        public void endGame()
+        {
+        	facade.endGame();
+        }
+        @Override
+        public Colour onMove()
+        {
+        	return facade.onMove();
+        }
+        @Override
+        public void makeMove(int x,int y) throws InitialBreathException, PlaceReservedException, RepeatedSituationException, PlayerPassedException
+        {
+        	facade.makeMove(x, y);
+        }
+        @Override
+        public void pass()
+        {
+        	facade.pass();
+        }
+        public void setOpponent(Player opponent) 
+        {
+            this.opponent = opponent;
+        }
+        @Override
+    	public Report getResults()
+    	{
+        	return facade.getResults();
+    	}
+        public void run()
+        {
+        		boolean giveup = false;
+        		try {
+                    /* W¹tek rozpoczyna siê, gdy wszyscy s¹ po³¹czeni*/
+                    output.println("MESSAGE All players connected");
+
+                    if (colour == Colour.BLACK) 
+                    {
+                        output.println("MESSAGE Your move");
+                    }
+
+                    while (true) {
+                        String[] command = input.readLine().split(" "); /*tablica oddzielonych slow miedzy soba slowami*/
+                        if(onMove() == this.colour)
+                        {
+                        	if (command[0].equals("ADD")) /*jesli zaczyna sie slowem add*/ 
+                        	{
+                        		giveup = false;
+                        		try{
+                        			makeMove(Integer.parseInt(command[1]), Integer.parseInt(command[2]));
+                        		}
+                        		catch(PlaceReservedException e)
+                        		{
+                        			output.println("ERROR Place is already reserved");
+                        		}
+                        		catch(InitialBreathException e)
+                        		{
+                        			output.println("ERROR Lack of initial breaths");
+                        		}
+                        		catch(RepeatedSituationException e)
+                        		{
+                        			
+                        		}
+                        		catch(PlayerPassedException e)
+                        		{
+                        			
+                        		}
+                        	}
+                        	else if (command[0].equals("QUIT"))
+                        	{
+                        		opponent.output.println("MESSAGE You won");
+                        		break;
+                        	}
+                        	else if (command[0].equals("GIVEUP"))
+                        	{
+                        		if(giveup)
+                        		{
+                        			/*liczymy punkty, DO NAPISANIA*/
+                        		}
+                        		else
+                        		{
+                        			giveup = true;
+                        		}
+                        	}
+                        	//game.changeColourOnMove(); zmienianiem koloru zajmuje siê logika gry
+                        }
+                    }
+                } 
+                catch (IOException e) {
+                    System.out.println("Player died: " + e);
+                } 
+                finally {
+                    try {socket.close();} catch (IOException e) {}
+                }
+        }
+}
+      		
+  

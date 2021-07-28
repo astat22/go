@@ -1,0 +1,129 @@
+package Server;
+
+import java.io.IOException;
+
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.PlayerPassedException;
+import Exceptions.RepeatedSituationException;
+import Game.Colour;
+import Game.Report;
+import Message.Message;
+import Player.*;
+
+public class PlayedGame extends Thread
+{
+	public Player playerWhite;
+	public Player playerBlack;
+	public int boardSize = 19;
+	private PlayerToGameFacade facade;
+	public void run()
+	{
+		playerBlack.setFacade(playerWhite.getFacade());
+		this.facade = playerWhite.getFacade();
+		setOpponent();
+		System.out.println("Rozpoczêcie nowej gry - serwer powiadamia graczy");
+		noticeStart();
+    	Player pom = playerOnMove();
+  		Message order;
+		while(!pom.isGameEnded())
+		{
+			try
+			{
+				order = (Message) pom.input.readObject();
+				followOrders(order);
+			}
+			catch(IOException e){}
+			catch(ClassNotFoundException e){}
+			pom = playerOnMove();
+		}
+	}
+	public void setOpponent()
+	{
+		playerBlack.setOpponent(playerWhite);
+		playerWhite.setOpponent(playerBlack);
+	}
+    public void noticeStart()
+    {
+    	try
+    	{
+    		Message startMessageW = new Message(Order.START,Colour.WHITE);
+    		Message startMessageB = new Message(Order.START,Colour.BLACK);
+    		playerWhite.output.writeObject(startMessageW);
+    		playerBlack.output.writeObject(startMessageB);
+    		//this.run();
+    	}
+    	catch(IOException e){}
+    }
+    private Player playerOnMove()
+    {
+    	Colour onMove = playerBlack.onMove();
+    	if(onMove==Colour.BLACK)
+    		return playerBlack;
+    	else
+    		return playerWhite;
+    }
+    private Player playerNextToMove()
+    {
+    	Colour onMove = playerBlack.onMove();
+    	if(onMove==Colour.BLACK)
+    		return playerWhite;
+    	else
+    		return playerBlack; 	
+    }
+    public void followOrders(Message m)
+    {
+    	Player pom = playerOnMove();
+    	Player np = playerNextToMove();
+    	switch(m.getOrder())
+    	{
+        	case PLAY:
+        		System.out.println("min: PLAY");
+        		try
+        		{
+        			pom.makeMove(m.getX(),m.getY());
+        		}
+        		catch(InitialBreathException e){}
+        		catch(PlaceReservedException e){}
+        		catch(RepeatedSituationException e){}
+        		catch(PlayerPassedException e){}
+        		try/* jako odpowiedŸ zwró planszê*/
+        		{
+        			Colour[][] table = pom.getTable();
+        			Message responsePOM = new Message(Order.TABLE,table);
+        			Message responseNP = new Message(Order.PLAY,table);
+        			pom.output.writeObject(responsePOM);
+        			np.output.writeObject(responseNP);
+        			//System.out.println("mout: TABLE");
+        		}
+        		catch(IOException e){}
+        		break;
+        	case GET_TABLE:
+        		try/* jako odpowiedŸ zwró planszê*/
+        		{
+        			Colour[][] table = pom.getTable();
+        			Message response = new Message(Order.TABLE,table);
+        			playerBlack.output.writeObject(response);
+        			playerWhite.output.writeObject(response);
+        		}
+        		catch(IOException e){}
+        		break;
+        	case PASS:// Obsluzyc martwe pola
+        		pom.pass();
+        		if(pom.getFacade().isGameEnded())
+        		{
+        			Report report = pom.getResults();
+        			Message results = new Message(Order.RESULTS,report);
+        			try
+        			{
+            			playerBlack.output.writeObject(results);
+            			playerWhite.output.writeObject(results);
+            		}
+            		catch(IOException e){}
+        		}
+        		break;
+        	default:
+        		break;
+    	}
+    }
+}

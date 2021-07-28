@@ -1,0 +1,8 @@
+package GameTest;
+import org.junit.Test;
+
+public class GameTest
+{
+
+
+}

@@ -1,0 +1,60 @@
+package Game;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import Exceptions.IllegalInitialisationOfTerritoryException;
+
+public class Territory extends Plane
+{
+	public Colour territoryOwner;//w³aœciciel terytorium
+	public int points; //liczba punktów za terytorium
+	/**
+	 * Konstruktor terytorium. Jako parametr przyjmuje puste pole na planszy, place, le¿¹ce obok kamienia requester.
+	 * Konstruktor dodaje kolejne pola do listy, przeszukuj¹c wynikek planszy ograniczony kamieniami graczy.
+	 * @param place Pole, od którego zaczniemy uslalanie terytorium
+	 * @param requester kamieñ gracza, który roœci sobie prawo do terytorium
+	 */
+	public Territory(Square place, Square requester) throws IllegalInitialisationOfTerritoryException
+	{
+		if(place.getColour()!=Colour.NONE || !requester.isAlive())//terytorium inicjalizuje siê polem, które nie nale¿y do nikogo lub z miejsca, które jest martwe
+			throw new IllegalInitialisationOfTerritoryException();
+		else
+		{
+			exploreTerritory();//ustalamy terytorium
+			computeNeighbours();//ustalamy s¹siadów
+			//ustalamy w³aœciciela
+			//ustalamy liczbê punktów
+		}
+		
+	}
+	/**
+	 * Rekurencyjna metoda wype³niania terytorium
+	 */
+	public void exploreTerritory()
+	{
+		computeNeighbours();
+		int check = 0;
+		for(Square s: this.neighbours)
+		{
+			if(!neighbours.contains(s) && s.getColour()==Colour.NONE) //na liœcie nie ma jeszcze tego pustego pola
+			{
+				stones.add(s);//dodajemy kamieñ
+				check++;
+			}
+		}
+		//if(listEqualsNoOrder(neighbours, computeListOfNeighbours()))//warunek koñcowy: s¹siedzi przed obliczeniami i po obliczeniach s¹ tacy sami
+		if(check>0)//³atwiejszy warunek koñcowy: jeœli w przebiegu funkcji dodaliœmy jakiekolwiek pole, to wywo³ujemy funkcjê rekurencyjnie
+		{
+			exploreTerritory();
+		}
+	}
+	public static <T> boolean listEqualsNoOrder(List<T> l1, List<T> l2) 
+	{
+	    final Set<T> s1 = new HashSet<>(l1);
+	    final Set<T> s2 = new HashSet<>(l2);
+
+	    return s1.equals(s2);
+	}
+}

@@ -1,0 +1,52 @@
+package GameTest;
+
+
+import org.junit.*;
+
+import Exceptions.IllegalMoveException;
+import Game.*;
+
+
+public class GameTest
+{
+	Game game;
+	@Before
+	public void runBeforeTest()
+	{
+		game = new Game(19);
+	}
+	@Test
+	public void createSquaresTest()
+	{
+		Assert.assertTrue("Type test", SType.SW == game.getSquareByCoordinates(0, 0).getType());
+		Assert.assertTrue("Type test", SType.NE == game.getSquareByCoordinates(18, 18).getType());
+		Assert.assertTrue("Type test", SType.REGULAR == game.getSquareByCoordinates(17, 17).getType());
+		Assert.assertEquals("Neighbour test", null , game.getSquareByCoordinates(0, 0).getNeighbours()[1]);
+		Assert.assertEquals("Neighbour test", game.getSquareByCoordinates(0, 1) , game.getSquareByCoordinates(0, 0).getNeighbours()[0]);
+		Assert.assertEquals("Neighbour test", game.getSquareByCoordinates(4, 5) , game.getSquareByCoordinates(5, 5).getNeighbours()[2]);
+		Assert.assertNotEquals("Neighbour test", game.getSquareByCoordinates(4, 6) , game.getSquareByCoordinates(5, 5).getNeighbours()[2]);
+	}
+	@Test
+	public void addStoneTest()
+	{
+		int dummyGameX[] = {0,1,2,3,0,1,0,0,10};
+		int dummyGameY[] = {0,0,0,0,1,1,2,3,10};
+		try
+		{
+			for(int i=0;i<dummyGameX.length;i++)
+			{
+				game.addStone(dummyGameX[i], dummyGameY[i], game.onMove);
+				game.changeColourOnMove();
+			}
+		}
+		catch(IllegalMoveException e)
+		{
+			System.out.println("Nielegalny ruch!");
+		}
+		Assert.assertEquals(6,game.chains.size());
+		Assert.assertEquals(1,game.chains.get(0).getBreaths());
+		Assert.assertEquals(2,game.findChainByStone(game.getSquareByCoordinates(3, 0) ).getBreaths());
+		Assert.assertEquals(1,game.findChainByStone(game.getSquareByCoordinates(2, 0) ).getBreaths());
+		Assert.assertEquals(4,game.findChainByStone(game.getSquareByCoordinates(10, 10) ).getBreaths());
+	}
+}

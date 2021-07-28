@@ -1,0 +1,164 @@
+package Game;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 
+ * @author Jacek
+ *
+ */
+public class Game 
+{
+	private int boardSize; 
+	public List<Chain> chains;
+	private Square[][] squares;
+	private Colour[][] board;
+	private Colour[][] previousBoard;
+	private boolean[][] legalMoves;
+	public Colour onMove = Colour.BLACK;
+	public Game(int size)
+	{
+		this.boardSize=size;
+		createSquares();
+	}
+/**
+ * Metoda wywo³ywana tylko raz, przez konstruktor. Tworzy boardSize x boardSize obiektów typu Square i umieszcza je w tablicy squares.
+ */
+	public void createSquares()
+	{
+		squares = new Square[boardSize][boardSize];
+		for(int y=0;y<boardSize;y++)
+			for(int x=0;x<boardSize;x++)
+			{
+				squares[x][y] = new Square(x,y,computeType(x,y));
+			}
+		//okreœlanie s¹siadów TODO
+	}
+	public Chain findChainByStone(Square stone)
+	{
+		for(Chain chain: chains)
+		{
+			if(chain.isStoneHere(stone))
+				return chain;
+		}
+		return null;
+	}
+	public Type computeType(int x,int y)
+	{
+		if(x==0 && y==0)
+			return Type.SW;
+		if(x==boardSize-1 && y==0)
+			return Type.SE;
+		if(x==0 && y==boardSize-1)
+			return Type.NW;
+		if(x==boardSize-1 && y==boardSize-1)
+			return Type.NE;
+		if(x==0)
+			return Type.W;
+		if(x==boardSize-1 )
+			return Type.E;
+		if(y==0)
+			return Type.S;
+		if(y==boardSize-1)
+			return Type.N;
+		return Type.REGULAR;
+	}
+	public Square getSquareByCoordinates(int x,int y)
+	{
+		return squares[x][y];
+	}
+	/**
+	 * £¹czy dwa ³añcuchy z listy c w jeden, C
+	 * Usuwa z listy @chains ³añcuchy z c.
+	 * Wylicza now¹ liczbê oddechów dla C.
+	 * Jeœli ruch okaza³by siê niedozwolony, C nie jest dodawany do listy, a c nie s¹ usuwane
+	 * 
+	 * @param c
+	 *
+	 */
+	private void mergeChains(List<Chain> listOfChains) throws CannotMergeChainsException
+	{
+		List<Square> sumOfSquaresLists = new ArrayList<Square>();
+		for(Chain c: listOfChains)
+		{
+			sumOfSquaresLists.addAll(c.getStones());
+		}
+		Chain newChain = new Chain(sumOfSquaresLists);
+		if(newChain.getBreaths()>0)
+		{
+			for(Chain c: listOfChains)
+			{
+				removeChainFromChainList(c);
+			}
+			chains.add(newChain);
+		}
+		else
+		{
+			throw new CannotMergeChainsException();
+		}
+	}
+	public void removeChainFromChainList(Chain chainToRemove)
+	{
+		chains.remove(chainToRemove);
+	}
+	public void addStone(int x, int y, Colour colour) throws IllegalMoveException
+	{
+		Square place = getSquareByCoordinates(x, y);
+		if(place.getColour()!=Colour.NONE) //miejsce jest zajête
+		{
+			throw new IllegalMoveException();
+		}
+		else
+		{
+			//sprawdzanie s¹siadów TODO
+			
+		}
+	}
+	/**
+	 * Metoda wykonywana po ka¿dym ruchu, oddaj¹ca kolejkê drugiemu graczowi
+	 */
+	public void changeColourOnMove()
+	{
+		if(onMove == Colour.BLACK)
+			onMove = Colour.WHITE;
+		else
+			onMove = Colour.BLACK;
+	}
+	public void removeChainFromBoard(Chain chainToRemove)
+	{
+		//TODO
+	}
+	/**
+	 * Metoda otrzymuje Square place jako parametr i zwraca takie s¹siednie ³añcuchy place, które maj¹ identyczny kolor jak place
+	 * @param place
+	 * @return
+	 */
+	public List<Chain> getNeighbourChains(Square place)
+	{
+		List<Chain> neighbourChainList = new ArrayList<Chain>();
+		Colour colour = place.getColour();
+		Square[] neighbours = place.getNeighbours();
+		Chain localChain;
+		for(Square s: neighbours)
+		{
+			if(s!=null)//place mo¿e le¿e na brzegu
+			{
+				if(s.getColour()==colour) //szukamy ³añcuchy tego samego koloru co place
+				{
+					localChain = findChainByStone(s);
+					if(!neighbourChainList.contains(localChain)) //do listy dodajemy tylko unikatowe ³añcuchy
+						neighbourChainList.add(localChain);
+				}
+			}
+		}
+		if(neighbourChainList.size()>0)//zamiast pustej listy zwracamy null
+			return neighbourChainList;
+		else
+			return null;
+	}
+	public boolean initialBreathCheking(Square s)
+	{
+		//TODO
+		return false;
+	}
+}

@@ -1,0 +1,30 @@
+package Server;
+
+import java.io.IOException;
+
+import Game.Colour;
+import Message.Message;
+import Player.*;
+
+public class PlayedGame extends Thread
+{
+	public Player playerWhite;
+	public Player playerBlack;
+	public int boardSize = 19;
+	public void setOpponent()
+	{
+		playerBlack.setOpponent(playerWhite);
+		playerWhite.setOpponent(playerBlack);
+	}
+    public void noticeStart()
+    {
+    	try
+    	{
+    		Message startMessageW = new Message(Order.START,Colour.WHITE);
+    		Message startMessageB = new Message(Order.START,Colour.BLACK);
+    		playerWhite.output.writeObject(startMessageW);
+    		playerBlack.output.writeObject(startMessageB);
+    	}
+    	catch(IOException e){}
+    }
+}

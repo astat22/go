@@ -1,0 +1,14 @@
+package Server;
+
+import Player.*;
+
+public class PlayedGame 
+{
+	public Player playerWhite;
+	public Player playerBlack;
+	public void setOpponent()
+	{
+		playerBlack.setOpponent(playerWhite);
+		playerWhite.setOpponent(playerBlack);
+	}
+}

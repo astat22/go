@@ -1,0 +1,7 @@
+package Game;
+
+public class Territory extends Plane
+{
+	public int territoryOwner=0;
+	public int points;
+}

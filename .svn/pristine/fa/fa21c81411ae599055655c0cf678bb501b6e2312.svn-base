@@ -1,0 +1,77 @@
+//Adapter powinien przesy³ac informacjê o ruchu zarówno do Game gracza, jak i Game przeciwnika:
+//Game gracza i Game przeciwnika powinny wykonac takie same operacje
+
+
+package Player;
+
+import Exceptions.IllegalMoveException;
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.RepeatedSituationException;
+import Game.*;
+
+public class PlayerToGameFacade implements IPlayerToGame 
+{
+
+	Game game;
+	public PlayerToGameFacade(int boardSize) {
+		game = new Game(boardSize);
+		
+	}
+	@Override
+	public void startGame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pass() {
+		// TODO
+
+	}
+
+	@Override
+	public Colour[][] getTable() 
+	{
+		return game.getBoard();
+	}
+
+	@Override
+	public void makeMove(int x, int y) throws InitialBreathException, PlaceReservedException, RepeatedSituationException
+	{
+		Colour[][] prev = game.getPreviousBoard();
+		Colour[][] now = game.getBoard();
+		game.squaresToBoard(game.getPreviousBoard());
+		try{
+			game.addStone(x, y, game.getOnMove());
+			game.squaresToBoard(game.getBoard());
+			game.changeColourOnMove();
+		}
+		catch(IllegalMoveException e)
+		{
+			//wracamy do stanu pocz¹tkowego
+			game.setPreviousBoard(prev);
+			game.setBoard(now);
+			//przeka¿ wyj¹tki dalej
+			if(e instanceof InitialBreathException)
+				throw new InitialBreathException();
+			if(e instanceof PlaceReservedException)
+				throw new PlaceReservedException();
+			if(e instanceof RepeatedSituationException)
+				throw new RepeatedSituationException();
+		}
+	}
+
+	@Override
+	public void setDeadSquare(int x, int y) 
+	{
+		// TODO Auto-generated method stub
+
+	}
+	
+	@Override
+	public Colour onMove()
+	{
+		return game.getOnMove();
+	}
+}

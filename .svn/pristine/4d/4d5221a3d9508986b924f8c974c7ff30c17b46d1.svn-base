@@ -1,0 +1,161 @@
+/*TODO
+ * nazwa u¿ytkownika
+ * obiekt Player i komunikacja z nim
+ * implementacja MouseListener
+ */
+package Client;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowListener;
+import java.awt.geom.Line2D;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import javax.swing.*;
+
+import Game.Colour;
+import Message.Message;
+import Server.Order;
+
+//import Player.Player;
+
+public class Client extends Thread
+{
+	public static final long serialVersionUID = 42L;
+	private Window frame;
+    private JLabel messageLabel;
+	
+	private int PORT = 8990;
+    private Socket socket;
+	private ObjectInputStream clInput;
+	private ObjectOutputStream clOutput;
+	private int boardSize = 19;
+	Colour[][] table;
+	private Colour myColour;
+	private boolean movingFase = true, settingDeadSquaresFase=false;
+
+    public Client(String serverAddress) 
+    {
+    	//messageLabel =  new JLabel("");
+    	try
+    	{
+        	socket = new Socket(serverAddress, PORT);
+			clOutput = new ObjectOutputStream(socket.getOutputStream());
+			clInput = new ObjectInputStream(socket.getInputStream());
+            //in.readObj
+    	}
+    	catch(IOException e){}
+//trzeba poczeka na przeciwnika    
+    	startGame();
+    	frame = new Window(boardSize);
+        
+    }
+    
+    public void run()
+    {
+    	//czarny gracz rozpoczyna od ruchu
+    	if(myColour==Colour.BLACK)
+    	{
+			frame.setActive();// odblokuj u¿ytkownikowi mo¿liwoœc wykonania akcji
+			waitForOrder();//czekaj na akcjê u¿ytkownika
+    	}
+    	else
+    	{
+    		frame.setOrder(Order.DENY);//ka¿ bia³emu czekac
+    	}
+    	Message incommingMessage;
+    	while(movingFase)
+    	{
+    		try
+    		{
+    			incommingMessage = (Message)clInput.readObject();//czekaj na wiadomoœc
+    			followOrders(incommingMessage);//obs³u¿ wiadomoœc
+    			frame.setActive();// odblokuj u¿ytkownikowi mo¿liwoœc wykonania akcji
+    			waitForOrder();//czekaj na akcjê u¿ytkownika
+    		}
+    		catch(IOException e){}
+    		catch(ClassNotFoundException e){}
+    	}
+    }
+    public static void main(String[] args) throws Exception 
+    {
+        String serverAddress="localhost";
+        String login = "Jacek";
+        JOptionPane.showInputDialog("Podaj adres serwera",serverAddress);//(args.length == 0) ? "localhost" : args[1];
+        JOptionPane.showInputDialog("Podaj login",login);
+        String[] opponent = {"Bot","Losowy przeciwnik"};
+        JFrame question = new JFrame("Wybór przeciwnika");
+        String opponentName = (String) JOptionPane.showInputDialog(question, 
+                "Wybierz przeciwnika",
+                "Opponent",
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                opponent, 
+                opponent[1]);
+        Client client;
+        if(!opponentName.equals("Bot"))
+        	 client = new Client(serverAddress);
+        else//graj z botem TODO
+        	;
+    }
+    
+    /**
+     * Metoda oczekuj¹ca na sygna³ do rozpoczêcia gry
+     */
+    public void startGame()
+    {
+    	//System.out.println("Oczekiwanie na przeciwnika");
+    	try
+    	{
+    		Message startMessage = (Message) clInput.readObject();
+    		myColour = startMessage.col;
+    		System.out.println("Odebrano potwierdzenie rozpoczêcia gry");
+    		/*if(startMessage.getOrder()==Order.SIZE)//serwer pyta o rozmiar
+    		{
+    			String[] size = {"19x19","13x13","9x9"};
+    			JFrame question = new JFrame("Wybór przeciwnika");
+    	        String sizeName = (String) JOptionPane.showInputDialog(question, 
+    	                "Wybierz rozmiar planszy",
+    	                "Size",
+    	                JOptionPane.QUESTION_MESSAGE, 
+    	                null, 
+    	                size, 
+    	                size[0]);
+    	        //wyœlij odpowiedŸ
+    			startGame();//czekaj na drugiego gracza
+    		}*/
+    	}
+    	catch(IOException e){ System.out.println("IO Error");}
+    	catch(ClassNotFoundException e){}
+    }
+    public void followOrders(Message m)
+    {
+    	switch(m.getOrder())
+    	{
+    		case TABLE:
+    			frame.setTable(m.getTable());
+    			frame.repaint();
+    			break;
+    		default:
+    			break;
+    	}
+    }
+    public void waitForOrder()
+    {
+    	Message letter;
+    	while(frame.isActive()) //czekaj a¿ u¿ytkownik wykona akcjê
+    		;
+    	switch(frame.getOrder())
+    	{
+    		case PLAY:
+    			letter = new Message(frame.getOrder(),frame.getCoord()[0],frame.getCoord()[1]);
+    			break;
+    		default:
+    			break;
+    	}
+    	
+    }
+}

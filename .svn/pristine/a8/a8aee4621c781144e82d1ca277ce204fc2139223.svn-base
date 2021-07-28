@@ -1,0 +1,15 @@
+package Player;
+
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Game.Colour;
+
+public interface IPlayerToGame 
+{
+	public void pass();
+	public Colour[][] getTable();
+	public void makeMove(int x,int y) throws InitialBreathException,PlaceReservedException;
+	public void setDeadSquare(int x,int y);
+	public void startGame();
+	public Colour onMove();
+}

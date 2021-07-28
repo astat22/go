@@ -1,0 +1,42 @@
+//Adapter powinien przesy³ac informacjê o ruchu zarówno do Game gracza, jak i Game przeciwnika:
+//Game gracza i Game przeciwnika powinny wykonac takie same operacje
+
+
+package Player;
+
+import Game.Colour;
+
+public class PlayerToGameFacade implements IPlayerToGame 
+{
+
+	@Override
+	public void startGame() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void pass() {
+		// TODO
+
+	}
+
+	@Override
+	public Colour[][] getTable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void makeMove(int x, int y) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setDeadSquare(int x, int y) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

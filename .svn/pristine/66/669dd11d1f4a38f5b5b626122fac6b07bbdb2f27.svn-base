@@ -1,0 +1,36 @@
+package Message;
+
+import java.io.Serializable;
+
+import Game.Colour;
+import Server.Order;
+
+public class Message implements Serializable
+{
+	public static final long serialVersionUID = 42L;
+	public final Order order;
+	public Colour[][] table;
+	public int x,y;
+	public String owner;
+	public Colour col;
+	public Message(Order order)
+	{
+		this.order = order;
+	}
+	public Message(Order order, Colour[][] table)
+	{
+		this.order = order;
+		this.table = table;
+	}
+	public Message(Order order, int x, int y)
+	{
+		this.order = order;
+		this.x = x;
+		this.y = y;
+	}
+	public Message(Order order,Colour c)
+	{
+		this.order = order;
+		this.col = c;
+	}
+}

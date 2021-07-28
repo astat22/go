@@ -1,0 +1,6 @@
+package Game;
+
+public enum Type 
+{
+	REGULAR, N,S,W,E,NW,NE,SW,SE;
+}

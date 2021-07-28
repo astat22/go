@@ -1,0 +1,21 @@
+package Server;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+public class User 
+{
+	public String name;
+	public final Socket socket;
+	public final int port;
+	public boolean occupied = false;
+	public ObjectInputStream input;
+	public ObjectOutputStream output;
+	public User(Socket socket, int port)
+	{
+		this.socket = socket;
+		this.port = port;
+	}
+
+}

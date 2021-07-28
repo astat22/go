@@ -1,0 +1,18 @@
+package Server;
+
+import java.net.Socket;
+
+public class User 
+{
+	public final String name;
+	public final Socket socket;
+	public final int port;
+	public boolean occupied = false;
+	public User(String name, Socket socket, int port)
+	{
+		this.name = name;
+		this.socket = socket;
+		this.port = port;
+	}
+
+}

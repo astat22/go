@@ -1,0 +1,60 @@
+package Client;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.swing.*;
+
+public class Client extends JFrame
+
+{
+	private JFrame frame = new JFrame("Go game");
+    private JLabel messageLabel = new JLabel("");
+	
+	private static int PORT = 8989;
+    private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
+    
+    public Client(String serverAddress) 
+    {
+    	try
+    	{
+        	socket = new Socket(serverAddress, PORT);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+    	}
+    	catch(IOException e)
+    	{
+    		
+    	}
+        
+        setSize(800,800);
+      //TODO tu trzeba siê jeszcze pobawic, nie wiem, jak bêdzie, ale koniecznie œcie¿ka wzdlêdna!
+        JLabel background = new JLabel(new ImageIcon("./images/goboard.png")); 
+    }
+    
+    /* G³ówny strumieñ klienta czeka na wiadomoœc z serwera.*/
+    
+    public void play() throws Exception
+    {
+    	/*zajmuje sie klikaniem na planszy i przesylanie informacji
+    	 */
+    }
+    
+    public static void main(String[] args) throws Exception {
+        while (true) {
+            String serverAddress = (args.length == 0) ? "localhost" : args[1];
+            Client client = new Client(serverAddress);
+            client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            client.frame.setSize(800, 800);
+            client.frame.setVisible(true);
+            client.frame.setResizable(false);
+            client.play();
+        }
+}
+
+}

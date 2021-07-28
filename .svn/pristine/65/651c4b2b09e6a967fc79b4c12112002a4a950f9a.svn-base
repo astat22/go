@@ -1,0 +1,64 @@
+package Server;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.io.*;
+import java.net.*;
+
+import Game.Colour;
+import Message.Message;
+import Player.Player;
+
+public class Server
+{
+	public static List<PlayedGame> currentGames;
+	public static List<User> users;
+	private static int port = 8990;
+	public static void main(String[] args) throws Exception
+	{
+		currentGames = new ArrayList<PlayedGame>();
+		/*Tworze na podanym porcie gniazdo serwera,
+		 *które posiada dodatkowe funkcjonalnoœci umo¿liwiaj¹ce równoczesn¹ obs³ugê wielu po³¹czeñ.
+		 */
+		ServerSocket listener = new ServerSocket(port);
+		Socket wSock,blSock;
+		System.out.println("Go game server is running");
+		try
+		{
+			while (true)
+			{
+				/*Tworze nowa gre, do której bêdê przypisywac graczy*/
+				PlayedGame newGame = new PlayedGame();
+				/* Metoda accept() czeka na nadejœcie po³¹czenia, 
+				 * jeœli ¿¹danie takie po³¹czenia nadejdzie, 
+				 * to zwraca nowe gniazdo s³u¿¹ce do obs³ugi tego po³¹czenia.*/
+				wSock = listener.accept();
+				System.out.println("Nowy bia³y gracz");
+				ObjectOutputStream oos = new ObjectOutputStream(wSock.getOutputStream());
+				ObjectInputStream ois = new ObjectInputStream(wSock.getInputStream());
+				//oos.writeObject(new Message(Order.SIZE,0,0));//zapytaj o rozmiar
+				//Message sm = (Message)ois.readObject();//odpowiedŸ z rozmiarem
+				
+				newGame.playerWhite = new Player(wSock,Colour.WHITE,ois,oos,19);//sm.getX());
+				/*oczekiwanie na gracza czarnego*/
+				blSock = listener.accept();
+				System.out.println("Nowy czarny gracz");
+				newGame.playerBlack = new Player(listener.accept(),Colour.BLACK,
+						new ObjectInputStream(blSock.getInputStream()),
+						new ObjectOutputStream(blSock.getOutputStream()),
+						newGame.playerWhite.getFacade());//fasada jest jedna dla obu graczy
+				/*Okreslam przeciwnikow*/
+				newGame.setOpponent();
+				//game.currentPlayer = playerBlack;
+				/*Wyœlij wiadomoœ inicjalizuj¹c¹ grê*/
+				
+
+				currentGames.add(newGame);
+			}
+		}
+		finally
+		{
+			listener.close();
+		}
+	}
+}

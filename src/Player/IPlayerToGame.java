@@ -1,0 +1,57 @@
+//TODO koñczenie gry, podliczanie punktów
+package Player;
+
+import Exceptions.GameNotEndedException;
+import Exceptions.IllegalOwnerException;
+import Exceptions.InitialBreathException;
+import Exceptions.PlaceReservedException;
+import Exceptions.PlayerPassedException;
+import Exceptions.RepeatedSituationException;
+import Game.Colour;
+import Game.Report;
+
+public interface IPlayerToGame 
+{
+	/**
+	 * Bie¿¹cy gracz zrzeka siê ruchu
+	 */
+	public void pass();
+	/**
+	 * Metoda pobieraj¹ca planszê wraz z aktualnie stoj¹cymi na niej kamieniami
+	 * @return
+	 */
+	public Colour[][] getTable();
+	/**
+	 * Metoda s³u¿¹ca do wykonywania ruchu. Bie¿¹cy gracz stawia na planszy swój kamieñ w miejsce (x,y).
+	 * @param x
+	 * @param y
+	 * @throws InitialBreathException Miejsce, w którym chcesz postawic kamieñ, jest martwe
+	 * @throws PlaceReservedException Miejsce, w którym chcesz postawi kamieñ, jest zajête przez inny kamieñ
+	 * @throws RepeatedSituationException Gdybyœ postawi³ w ten sposób kamieñ, z³ama³byœ regu³ê Ko
+	 * @throws PlayerPassedException Gracz, który spasowa³, nie mo¿e wykona ruchu
+	 */
+	public void makeMove(int x,int y) throws 
+		InitialBreathException,
+		PlaceReservedException, 
+		RepeatedSituationException, 
+		PlayerPassedException;
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param owner Gracz, który oznacza kamieñ
+	 * @throws GameNotEndedException
+	 * @throws IllegalOwnerException
+	 */
+	public void setDeadSquare(int x,int y, Colour owner) throws GameNotEndedException, IllegalOwnerException;
+	/**
+	 * Metoda koñcz¹ca grê. Gra przechodzi do fazy oznaczania martwych pól. Dopiero wywo³anie metody getResults() doprowadzi do wyliczenia terytorium i pobrania punktów.
+	 */
+	public void endGame();
+	/**
+	 * Metoda zwracaj¹ca kolor gracza wykonuj¹cego posuniêcie.
+	 * @return
+	 */
+	public Colour onMove();
+	public Report getResults();
+}

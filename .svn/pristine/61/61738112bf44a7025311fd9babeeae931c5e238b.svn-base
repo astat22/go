@@ -1,0 +1,99 @@
+package Client;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class Window extends JFrame implements MouseListener
+{
+	JPanel board;
+	int boardSize;
+	private boolean signalled = false;//prze³¹cznik informuj¹cy o tym, czy ruch zosta³ wykonany
+	public Window(int boardSize)
+	{
+		this.boardSize=boardSize;
+		setSize(800,850);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+        setResizable(false);
+        addMouseListener(this);
+    	 board = new JPanel() 
+    	{
+	    	public static final long serialVersionUID = 42L;
+	        protected void paintComponent(Graphics g) 
+	        {
+	
+	            super.paintComponent(g);
+	
+	            Graphics2D g2 = (Graphics2D) g.create(); 
+	
+	        	g2.setColor(Color.BLACK);
+	        	for(int x=0;x<boardSize;x++)
+	        		g2.drawLine(20+40*x, 0,20+40*x,  20+boardSize*40);
+	        	for(int y=0;y<boardSize;y++)
+	        		g2.drawLine(0, 20+40*y, 20+boardSize*40,20+40*y  );
+	            g2.dispose();
+	
+	        }
+    	};
+        getContentPane().add(board);
+        setLocationRelativeTo(null);
+        setVisible(true);
+        board.repaint();
+	}
+	/**
+	 * Metoda zamieniaj¹ca wspó³rzêdne z ekranu na odpowiadaj¹ce im pole na planszy
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public int[] coord2Square(int x,int y)
+	{
+		int[] square = new int[2];
+		for(int i=0;i<boardSize;i++)
+		{
+			if(x>20+40*i && x<=20+40*(i+1))
+			{
+				square[0] = i;
+				break;
+			}
+		}
+		for(int i=0;i<boardSize;i++)
+		{
+			if(y>20+40*i && y<=20+40*(i+1))
+			{
+				square[1] = boardSize-1-i;
+				break;
+			}
+		}
+		return square;
+	}
+	public void mouseClicked(MouseEvent evt)
+    {
+    	int x = evt.getX();
+    	int y = evt.getY();
+    	if(!signalled)
+    	{
+    		int[] coord = coord2Square(x, y);
+    		System.out.println(coord[0]+" "+coord[1]);
+    		signalled = true;//ruch zosta³ wykonany
+    	}
+    }
+    public void mouseEntered(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){}
+    public void mousePressed(MouseEvent e){}
+    public void mouseExited(MouseEvent e){}
+	public boolean isSignalled() {
+		return signalled;
+	}
+	public void setSignalled(boolean signalled) {
+		this.signalled = signalled;
+	}
+    
+}
